@@ -9,20 +9,19 @@ Calculator::Calculator(QWidget *parent)
 	ui.setupUi(this);
 }
 
-
-
-QString expr, val, op, val_tmp;
-double value, num;
+QString expr, val, val_tmp;
+double value;
 bool isValue, isExcept, isSingle;
-QStack<double> numStack;
-QStack<QString> opStack;
+QStack<double> operandStack;
+QStack<QString> operatorStack;
 
 void Calculator::init() {
-	expr = ""; val = "0"; op = "+"; val_tmp = "";
-	value = 0; num = 0;
+	expr = ""; val = "0"; val_tmp = "";
+	value = 0;
 	isValue = true; isExcept = false; isSingle = false;
-	while (!numStack.isEmpty()) numStack.pop();
-	while (!opStack.isEmpty()) opStack.pop();
+	while (!operandStack.isEmpty()) operandStack.pop();
+	while (!operatorStack.isEmpty()) operatorStack.pop();
+	operatorStack.push("(");
 	ui.result->setAlignment(Qt::AlignRight);
 	ui.expression->setAlignment(Qt::AlignRight);
 	ui.expression->setText(expr);
@@ -30,7 +29,7 @@ void Calculator::init() {
 }
 
 void Calculator::getValue() {
-	if (isExcept == true) init();
+	if (isExcept == true) clear();
 	if (isValue == false || val == "0" || isSingle == true)
 		val = "";
 	if (isSingle == true) {
@@ -55,9 +54,31 @@ double isNeg(double v) {
 	return v;
 }
 
-void isStackEmpty() {
-	if (opStack.isEmpty() || numStack.isEmpty())
-		throw 1;
+double Calculator::processAnOperator(QStack<double> &operandStack, QStack<QString> &operatorStack) {
+	QString op = operatorStack.pop();
+	double num;
+	double a = operandStack.pop();
+	double b = operandStack.pop();
+	qDebug() << "a" << a << "b" << b;
+	if(op == "+")
+		num = a + b;
+	else if(op == "-")
+		num = b - a;
+	else if(op == "x")
+		num = a * b;
+	else {
+		try {
+			a = isZero(a);
+			num = b / a;
+		}
+		catch (double) {
+			clear();
+			isExcept = true;
+			ui.result->setText("Invalid input");
+		}
+	}
+	operandStack.push(num);
+	return num;
 }
 
 void Calculator::getExpr() {
@@ -66,73 +87,55 @@ void Calculator::getExpr() {
 	QString text = btn->text();
 	if (isValue == true) {
 		value = val.toDouble();
+		operandStack.push(value);
 	}
 	if (text.length() == 1) {
 		if (isSingle == true) {
-			expr = expr + val_tmp;
+			expr = expr + val_tmp + text;
 			val_tmp = "";
 		}
+		else if (isValue == false || text == "(") {
+			expr = expr + text;
+		}
+		else
+			expr = expr + val + text;
+
 		if (text == "(") {
-			numStack.push(num);
-			opStack.push(op);
-			num = 0;
-			op = "+";
 			if (isValue == false) {
 				value = 0;
 				val = "0";
 			}
-			expr = expr + "(";
-			ui.expression->setText(expr);
+			isValue = true;
+			operatorStack.push(text);
 		}
-		else {
-			if (op == "+") {
-				value = num + value;
+		else if (text == ")") {
+			while (operatorStack.top() != "(") {
+				value = processAnOperator(operandStack, operatorStack);
 			}
-			else if (op == "-") {
-				value = num - value;
+			operatorStack.pop();
+			isValue = false;
+			if (isExcept == false)
+				ui.result->setText(QString::number(value));
+		}
+		else if (text == "+" || text == '-') {
+			while (operatorStack.top() != '(') {
+				value = processAnOperator(operandStack, operatorStack);
 			}
-			else if (op == "x") {
-				value = num * value;
+			operatorStack.push(text);
+			isValue = false;
+			if (isExcept == false)
+				ui.result->setText(QString::number(value));
+		}
+		else if (text == "x" || text == "/") {
+			QString op_t = operatorStack.top();
+			while (op_t != "(" && op_t != "+" && op_t != "-") {
+				value = processAnOperator(operandStack, operatorStack);
+				op_t = operatorStack.top();
 			}
-			else if (op == "/") {
-				try {
-					value = isZero(value);
-					value = num / value;
-				}
-				catch (double) {
-					init();
-					isExcept = true;
-					ui.result->setText("Cannot Divide by zero");
-				}
-			}
-			if (text == ")") {
-				try {
-					isStackEmpty();
-					op = opStack.pop();
-					num = numStack.pop();
-					if (isValue == true)
-						expr = expr + val + text;
-					else
-						expr = expr + text;
-				}
-				catch (int) {
-					init();
-					isExcept = true;
-					ui.result->setText("\")\" cannot be alone");
-				}
-			}
-			else {
-				op = text;
-				num = value;
-				if (isValue == false)
-					expr = expr + text;
-				else if (isExcept == false)
-					expr = expr + val + text;
-			}
-			
-			ui.expression->setText(expr);
+			operatorStack.push(text);
 			isValue = false;
 		}
+		ui.expression->setText(expr);
 		isSingle = false;
 	}
 	else {
@@ -167,9 +170,11 @@ void Calculator::getExpr() {
 			ui.expression->setText("");
 		isValue = false;
 		isSingle = true;
+		operandStack.pop();
+		operandStack.push(value);
+		if (isExcept == false)
+			ui.result->setText(QString::number(value));
 	}
-	if(isExcept == false)
-		ui.result->setText(QString::number(value));
 }
 
 void Calculator::clear() {
@@ -183,36 +188,19 @@ void Calculator::del() {
 		ui.result->setText(val);
 	}
 	if (isExcept == true)
-		init();
+		clear();
 }
 
 void Calculator::equal() {
 	if (expr == "" || isExcept == true) return;
-	if (isValue == true)
+	if (isValue == true) {
 		value = val.toDouble();
-	if (op == "+") {
-		value = num + value;
+		operandStack.push(value);
 	}
-	else if (op == "-") {
-		value = num - value;
-	}
-	else if (op == "x") {
-		value = num * value;
-	}
-	else if (op == "/") {
-		try {
-			value = isZero(value);
-			value = num / value;
-		}
-		catch (double) {
-			init();
-			isExcept = true;
-			ui.result->setText("Cannot Divide by zero");
-		}
+	while (operatorStack.top() != '(') {
+		value = processAnOperator(operandStack, operatorStack);
 	}
 	expr = "";
-	num = 0;
-	op = "+";
 	isValue = false;
 	val = QString::number(value);
 	ui.expression->setText(expr);

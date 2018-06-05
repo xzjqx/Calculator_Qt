@@ -10,6 +10,7 @@ class Calculator : public QMainWindow
 public:
 	Calculator(QWidget *parent = Q_NULLPTR);
 	void init();
+	double processAnOperator(QStack<double> &operandStack, QStack<QString> &operatorStack);
 
 private:
 	Ui::CalculatorClass ui;

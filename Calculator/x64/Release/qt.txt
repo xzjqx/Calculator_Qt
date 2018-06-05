@@ -1,1 +1,0 @@
-Uic'ing Calculator.ui...;E:\Qt\Qt5.8.0\5.8\msvc2015_64\bin\uic.exe;"C:\Users\xzjqx\Desktop\Study\C++\workspace\Calculator\Calculator\Calculator.ui" -o ".\GeneratedFiles\ui_Calculator.h"
