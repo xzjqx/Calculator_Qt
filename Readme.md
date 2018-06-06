@@ -50,7 +50,7 @@ Phase3：点击等号键时，将栈中剩余部分全部弹出比计算结果�
 
 ### 效果展示
 
-<iframe src="https://github.com/xzjqx/Calculator_Qt/blob/master/images/%E8%BF%90%E7%AE%97%E7%AC%A6%E4%BC%98%E5%85%88%E7%BA%A7.gif">
+![](https://github.com/xzjqx/Calculator_Qt/blob/master/images/operator_priority.gif)
 
 
 
