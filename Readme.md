@@ -28,7 +28,7 @@ Calculator共实现了五个槽函数：
 - del()：退格键“<-”与这个槽函数相连，完成清除数字最后一位的操作；
 - equal()：等于键“=”与这个槽函数相连，完成计算结果并打印的操作。
 
-### Algorithm
+### 算法
 
 Calculator使用的算法主要集中在getExpr()槽函数对输入的计算上，主要维护两个栈operandStack和operatorStack来进行计算，算法如下：
 
@@ -48,7 +48,9 @@ Phase2：点击运算键，获取输入的运算符，调用getExpr()槽函数
 
 Phase3：点击等号键时，将栈中剩余部分全部弹出比计算结果，打印最终结果
 
-### Figures
+### 效果展示
+
+<iframe src="https://github.com/xzjqx/Calculator_Qt/blob/master/images/%E8%BF%90%E7%AE%97%E7%AC%A6%E4%BC%98%E5%85%88%E7%BA%A7.gif">
 
 
 
