@@ -32,6 +32,50 @@ Calculator共实现了五个槽函数：
 - del()：退格键“<-”与这个槽函数相连，完成清除数字最后一位的操作；
 - equal()：等于键“=”与这个槽函数相连，完成计算结果并打印的操作。
 
+#### 异常处理
+
+Calculator进行了两种运算过程中异常的判断——除0异常和根号下负数异常。实现方法都是在进行相应运算前，使用函数判断数据是否合法，不合法的情况下抛出异常，判断函数的实现如下： 
+
+```C++
+double isZero(double v) {
+    if (v == 0)
+        throw v;
+    return v;
+}
+
+double isNeg(double v) {
+    if (v < 0)
+        throw v;
+    return v;
+}
+```
+
+在运算前调用判断函数确定异常的过程如下：
+
+```C++
+try {
+    a = isZero(a);
+    num = b / a;
+}
+catch (double) {
+    clear();
+    isExcept = true;
+    ui.result->setText("Invalid input");
+}
+try {
+    value = isNeg(value);
+    value = sqrt(value);
+    val_tmp = "sqrt(" + val_tmp + ")";
+}
+catch (double) {
+    clear();
+    isExcept = true;
+    ui.result->setText("Invalid input");
+}
+```
+
+
+
 ### 算法
 
 Calculator使用的算法主要集中在getExpr()槽函数对输入的计算上，主要维护两个栈operandStack和operatorStack来进行计算，算法如下：
