@@ -10,6 +10,10 @@
 
 Calculator首先通过Qt Designer完成计算器界面的设计，再利用信号和槽函数将计算器中的按键和特定函数相连，当点击计算器按键时，触发槽函数，完成数据的录入，进一步完成表达式的计算，打印出结果。
 
+Calculator类图如下所示：
+
+![Calculator UML](https://github.com/xzjqx/Calculator_Qt/blob/master/images/Calculator_UML.jpg) 
+
 #### UI设计
 
 通过Qt Designer完成计算器UI的设计，在Qt Designer中，通过拖拽控件完成界面设计。
@@ -51,6 +55,12 @@ Phase3：点击等号键时，将栈中剩余部分全部弹出比计算结果�
 ### 效果展示
 
 ![](https://github.com/xzjqx/Calculator_Qt/blob/master/images/operator_priority.gif)
+
+![](https://github.com/xzjqx/Calculator_Qt/blob/master/images/parentheses.gif)
+
+![](https://github.com/xzjqx/Calculator_Qt/blob/master/images/unary_operation.gif)
+
+![](https://github.com/xzjqx/Calculator_Qt/blob/master/images/exception.gif)
 
 
 
